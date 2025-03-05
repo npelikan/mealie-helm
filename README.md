@@ -1,2 +1,3 @@
 # mealie-helm
-A Helm Chart for Mealie
+A Helm Chart for [Mealie](mealie.io)
+
