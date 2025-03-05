@@ -58,23 +58,37 @@ spec:
           {{- end }}
           
           volumeMounts:
+            {{- if .Values.persistence.enabled }}
             - name: mealie-data
               mountPath: /app/data/
+            {{- end }}
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
           envFrom:
+            {{- with .Values.mealie }}
+            {{- if .openai.enabled }}
             - secretRef:
-                name: mealie-openai-secret
+                name: {{ .openai.secret }}
+            {{- end }}
+            {{- if .postgres.enabled }}
             - secretRef:
-                name: mealie-oidc-secret
+                name: {{ .postgres.secret }}
+            {{- end }}
+            {{- if .oidc.enabled }}
+            - secretRef:
+                name: {{ .oidc.secret }}
+            {{- end}}
+            {{- end }}
             - configMapRef:
                 name: {{ include "mealie.fullname" . }}
       
       volumes:
+        {{- if .Values.persistence.enabled }}
         - name: mealie-data
           persistentVolumeClaim:
             claimName: {{ include "mealie.fullname" . }}
+        {{- end }}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}

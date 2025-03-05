@@ -3,27 +3,46 @@
 # Declare variables to be passed into your templates.
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+# strongly recommend using postgres if replicaCount > 1
 replicaCount: 1
 
 persistence:
-  # TODO: add ability to delete persistence
-  storageClass: longhorn
+  # strongly recommend this be set to true if not using postgres
+  enabled: false 
+  storageClass: ""
   size: 100G
 
-config:
-  PUID: "1000"
-  PGID: "1000"
-  TZ: America/Denver
-  # TODO: get this from ingress
-  BASE_URL: https://mealie.slopeinsight.com
-  #TODO: make this a top-level config
-  OIDC_AUTH_ENABLED: "true"
-  OIDC_CONFIGURATION_URL: https://authentik.slopeinsight.com/application/o/mealie/.well-known/openid-configuration
-
-# TODO: add ability to turn off and on ODIC, LDAP and OPENAI
-oidc_secret: mealie-oidc-secret
-openai_secret: mealie-openai-secret
-
+mealie:
+  # The Base URL of the Mealie service.
+  baseUrl: https://mealie.example.com
+  # The timezone Mealie should use. Should be in typical timezone name format eg "America/Denver"
+  tz: UTC
+  postgres: 
+    enabled: false # if disabled, defaults to sqlite database (recommended)
+    hostname: "postgres.postgres.svc.cluster.local"
+    dbname: mealie
+    port: 5432
+    # name of secret containing postgres authentication information for Mealie. The secret must 
+    # contain the keys POSTGRES_USER and POSTGRES_PASSWORD
+    secret: ""
+  oidc:
+    enabled: false
+    url: https://auth.example.com/.well-known/openid-configuration # be sure that this is your full configuration url
+    userClaim: email # OIDC username claim, eg "email" or "preferred_username"
+    # secret containing oidc information for Mealie. The secret must contain the keys OIDC_CLIENT_ID
+    #  and OIDC_CLIENT_SECRET
+    secret: ""
+  openai:
+    enabled: false
+    # secret containing openai key for mealie. must contain the key OPENAI_API_KEY
+    secret: ""
+    # TODO: add more openai config options here
+  # Use the following block to input any extra configs to mealie. 
+  # More information can be found here: https://docs.mealie.io/documentation/getting-started/installation/backend-config/
+  extraConfigs: {}
+    # PUID: "1000"
+    # PGID: "1000"
+  
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   repository: ghcr.io/mealie-recipes/mealie
@@ -77,25 +96,23 @@ service:
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
-  enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-  hosts:
-    - host: mealie.slopeinsight.com
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: 
-   - secretName: mealie.slopeinsight.com-tls
-     hosts:
-       - mealie.slopeinsight.com
+  enabled: false
+  # className: nginx
+  # annotations:
+  #   cert-manager.io/cluster-issuer: "letsencrypt"
+  #   nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  # hosts:
+  #   - host: mealie.example.com
+  #     paths:
+  #       - path: /
+  #         pathType: ImplementationSpecific
+  # tls: 
+  #  - secretName: mealie.example.com-tls
+  #    hosts:
+  #      - mealie.example.com
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 100m
