@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  mealie:
+  - apiVersion: v2
+    appVersion: v2.7.1
+    created: "2025-03-05T01:40:21.037915741Z"
+    description: A Helm chart for Kubernetes
+    digest: a9569f538bc5f16f425733deee9163c34b474a5929aa6286f8ea093ec5424fda
+    name: mealie
+    type: application
+    urls:
+    - https://github.com/npelikan/mealie-helm/releases/download/mealie-0.1.0/mealie-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-03-05T01:40:21.037921331Z"
