@@ -4,13 +4,16 @@
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 # strongly recommend using postgres if replicaCount > 1
+# TODO: deploy warning
 replicaCount: 1
 
 persistence:
+  # TODO: set storage mode
   # strongly recommend this be set to true if not using postgres
   enabled: false 
   storageClass: ""
-  size: 100G
+  accessMode: ReadWriteOnce
+  size: 25G
 
 mealie:
   # The Base URL of the Mealie service.
@@ -18,6 +21,7 @@ mealie:
   # The timezone Mealie should use. Should be in typical timezone name format eg "America/Denver"
   tz: UTC
   postgres: 
+    # TODO; add ability to create postgres instance via subchart
     enabled: false # if disabled, defaults to sqlite database (recommended)
     hostname: "postgres.postgres.svc.cluster.local"
     dbname: mealie
